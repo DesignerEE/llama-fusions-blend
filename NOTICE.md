@@ -23,9 +23,12 @@ harnesses, not a pull request, and is not proposed for upstream merge.
 
 ## Contents map
 
-- `fusions-v1.patch` — squashed diff against `b94959a` (34 files, +3639/−242).
-- `pub.bundle` — git bundle (`b94959a..pub`) of the same commit, for fetching
-  into a local clone of llama.cpp (see README "How to apply").
+- `patches/v6.patch` — full diff against `b94959a`: fusions (34 files, +3639/−242)
+  plus the v6 sampler lifecycle fix (+4 lines in `tools/server/server-context.cpp`).
+- `patches/fusions-v1.patch` — the fusions-only snapshot, kept for reference.
+- `bundle/llama-fusions-blend.bundle` — git bundle (`b94959a..v6`) with the
+  `v6` tag, for fetching into a local clone of llama.cpp.
+- `bundle/v1.bundle` — the earlier fusions-only bundle.
 - `docs/RESULTS.md` — the development journal: six submissions, per-genre
   numbers, nsys profiles, ablation results (including negative ones), and the
   root-cause write-up of the MTP draft-context overflow.
@@ -33,7 +36,9 @@ harnesses, not a pull request, and is not proposed for upstream merge.
 
 ## Known issues (see README)
 
-1. Sampler-chain assert (`llama_sampler_chain_backend_init() called twice`)
-   observed on RTX 5090 server workloads — open.
+1. Sampler-chain assert (`llama_sampler_chain_backend_init() called twice`) —
+   FIXED in v6: the detached greedy-persist chain is dropped so backend init
+   runs once per chain. Verified by a request-cycle smoke (greedy -> logit_bias
+   -> greedy) on RTX 5090, no abort.
 2. Cross-GPU logprob drift (exact-match identical; KL differs) — open.
 3. Model-family specific (Qwen3.8 hybrid GDN path).
